@@ -1,25 +1,33 @@
 from room import Room
+from player import Player
+from item import Item
 
 # Declare all the rooms
 
 room = {
     'outside':  Room("Outside Cave Entrance",
-                     "North of you, the cave mount beckons"),
+                     "North of you, the cave mount beckons",
+                     ['flower']
+                     ),
 
     'foyer':    Room("Foyer", """Dim light filters in from the south. Dusty
-passages run north and east."""),
+passages run north and east.""",
+[]),
 
     'overlook': Room("Grand Overlook", """A steep cliff appears before you, falling
 into the darkness. Ahead to the north, a light flickers in
-the distance, but there is no way across the chasm."""),
+the distance, but there is no way across the chasm.""",
+[]),
 
     'narrow':   Room("Narrow Passage", """The narrow passage bends here from west
-to north. The smell of gold permeates the air."""),
+to north. The smell of gold permeates the air.""",
+[]),
 
     'treasure': Room("Treasure Chamber", """You've found the long-lost treasure
-chamber! Sadly, it has already been completely emptied by
-earlier adventurers. The only exit is to the south."""),
+chamber! The gold is yours! Type "get gold" to get the gold!""", ['gold']),
 }
+
+item = {'flower': Item("flower", """The first item to get""")}
 
 
 # Link rooms together
@@ -35,9 +43,12 @@ room['treasure'].s_to = room['narrow']
 
 #
 # Main
-#
+#q
 
 # Make a new player object that is currently in the 'outside' room.
+player = Player(input("Please enter your name: "), room['outside'], inventory=None)
+
+print(player.current_room)
 
 # Write a loop that:
 #
@@ -49,3 +60,21 @@ room['treasure'].s_to = room['narrow']
 # Print an error message if the movement isn't allowed.
 #
 # If the user enters "q", quit the game.
+directions = ['n', 'e', 'w', 's']
+while True:
+    possible_get_item =  []
+    for x in player.current_room.items:
+        possible_get_item.append("get "+x)
+    cmd = input("\nINPUT: ").lower()
+    if cmd == "q":
+        print("Goodbye")
+        exit()
+    elif cmd in directions:
+        player.travel(cmd)
+
+
+    elif cmd in possible_get_item:
+        if player.current_room.items is not None:
+            print(player.current_room.items)
+    else:
+        print("That is not a valid input")
