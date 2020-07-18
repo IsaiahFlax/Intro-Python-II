@@ -6,8 +6,7 @@ from item import Item
 
 room = {
     'outside':  Room("Outside Cave Entrance",
-                     "North of you, the cave mount beckons",
-                     ['flower']
+                     "North of you, the cave mount beckons"
                      ),
 
     'foyer':    Room("Foyer", """Dim light filters in from the south. Dusty
@@ -24,12 +23,11 @@ to north. The smell of gold permeates the air.""",
 []),
 
     'treasure': Room("Treasure Chamber", """You've found the long-lost treasure
-chamber! The gold is yours! Type "get gold" to get the gold!""", ['gold']),
+chamber! The gold is yours! Type "get gold" to get the gold!"""),
 }
 
-item = {'flower': Item("flower", """The first item to get""")}
-
-
+room['outside'].items = [Item('flower', 'the first thing you can pick up'), Item('book', '"Learn Python", a book that would be helpful to read')]
+room['treasure'].items = [Item('gold', 'the treasure you have been looking for')]
 # Link rooms together
 
 room['outside'].n_to = room['foyer']
@@ -46,9 +44,13 @@ room['treasure'].s_to = room['narrow']
 #q
 
 # Make a new player object that is currently in the 'outside' room.
+print("Hello\nIn this game you can move in the cardinal directions by inputting 'n' for north, 'e' for east, 's' for south, and 'w' for west")
+print("Inputting 'i' will display items in your inventory")
+print("Typing 'get' or 'take' and then the name of the item you want to pickup adds the item to your inventory")
+print("Explore the cave, and find the gold!")
 player = Player(input("Please enter your name: "), room['outside'], inventory=None)
 
-print(player.current_room)
+print(player.name, player.current_room)
 
 # Write a loop that:
 #
@@ -61,20 +63,26 @@ print(player.current_room)
 #
 # If the user enters "q", quit the game.
 directions = ['n', 'e', 'w', 's']
+get_or_take = ['get', 'take']
 while True:
-    possible_get_item =  []
-    for x in player.current_room.items:
-        possible_get_item.append("get "+x)
     cmd = input("\nINPUT: ").lower()
-    if cmd == "q":
+    cmd_split = cmd.split(" ")
+    if cmd_split[0] in get_or_take and len(cmd_split) == 2:
+        player.get(cmd_split[1])
+    elif cmd_split[0] == "drop"and len(cmd_split) == 2:
+        player.drop(cmd_split[1])
+    elif cmd == "q":
         print("Goodbye")
         exit()
     elif cmd in directions:
         player.travel(cmd)
-
-
-    elif cmd in possible_get_item:
-        if player.current_room.items is not None:
-            print(player.current_room.items)
+    elif cmd == "i":
+        print("\nINVENTORY:\n")
+        if len(player.inventory) > 0:
+            inventory_list = []
+            for i in player.inventory:
+                print(f'{i.name}, {i.description}\n')
+        else:
+            print("Nothing in inventory")
     else:
         print("That is not a valid input")
